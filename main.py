@@ -47,7 +47,7 @@ def match_soundex(token):
     candidatesG = []
     bestMatch = ""
 
-    soundex = fuzzy.Soundex(8)
+    soundex = fuzzy.Soundex(4)
     soundex_token = soundex(token)
 
     candidates = [match for match in dictSet if soundex(match) == soundex_token]
@@ -115,7 +115,7 @@ def match_double_metaphone(token):
 
 def execute(method):
     results = []
-    count = 0
+
     if method == 0:
         methodName = 'levenshtein'
         target_method = match_levenshtein
@@ -130,7 +130,6 @@ def execute(method):
 
     with open('data/labelled-tokens.txt', 'r') as tokenFile:
         for tokenLine in tokenFile:
-            count += 1
             tokenSet = tokenLine.split('\t')
             token = tokenSet[0].strip()
             code = tokenSet[1].strip()
@@ -148,9 +147,6 @@ def execute(method):
 
             results.append(result)
             print result
-
-            if count == 10:
-                break
 
     timestamp_end = time.time()
     time_elapse = timestamp_end - timestamp_start
