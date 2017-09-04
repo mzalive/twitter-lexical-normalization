@@ -42,7 +42,24 @@ def match_levenshtein(token):
 
 
 def match_soundex(token):
-    return
+    dictSet = getDict()
+    candidates = []
+    candidatesG = []
+    bestMatch = ""
+
+    soundex = fuzzy.Soundex(8)
+    soundex_token = soundex(token)
+
+    candidates = [match for match in dictSet if soundex(match) == soundex_token]
+
+    if len(candidates) > 1:
+        G = ngram.NGram(candidates)
+        candidatesG = G.search(token)
+        bestMatch = candidatesG[0][0]
+    elif len(candidates) == 1:
+        bestMatch = candidates[0]
+
+    return bestMatch, candidates, candidatesG
 
 
 def match_double_metaphone(token):
@@ -109,6 +126,6 @@ def execute(method):
         json.dump(output, fout)
 
 
-execute(0)
+execute(1)
 
 
