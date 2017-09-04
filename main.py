@@ -19,7 +19,7 @@ def match_levenshtein(token):
     candidates = []
     candidatesG = []
     bestMatch = ""
-    minDistance = 1
+    minDistance = 3
 
     for item in dictSet:
         distance = Levenshtein.distance(token.lower(), item.lower())
@@ -34,7 +34,8 @@ def match_levenshtein(token):
     if len(candidates) > 1:
         G = ngram.NGram(candidates)
         candidatesG = G.search(token)
-        bestMatch = candidatesG[0][0]
+        if len(candidatesG) > 0:
+            bestMatch = candidatesG[0][0]
     elif len(candidates) == 1:
         bestMatch = candidates[0]
 
