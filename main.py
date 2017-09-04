@@ -63,7 +63,54 @@ def match_soundex(token):
 
 
 def match_double_metaphone(token):
-    return
+    dictSet = getDict()
+    candidates = []
+    candidatesG = []
+    class1 = []
+    class2 = []
+    class3 =[]
+    hasClass1 = False
+    hasClass2 = False
+    bestMatch = ""
+
+    dmeta = fuzzy.DMetaphone()
+    dm_token = dmeta(token)
+    dm_token_pk = dm_token[0]
+    dm_token_sk = dm_token[1]
+
+    for match in dictSet:
+        dm_match = dmeta(match)
+        dm_match_pk = dm_match[0]
+        dm_match_sk = dm_match[1]
+
+        if (dm_token_pk != 'None') and (dm_token_pk == dm_match_pk):
+            hasClass1 = True
+            class1.append(match)
+            continue
+        if (not hasClass1) and ((dm_token_pk != 'None' and dm_token_pk == dm_match_sk)
+                                or (dm_token_sk != 'None' and dm_token_sk == dm_match_pk)) :
+            hasClass2 = True
+            class2.append(match)
+            continue
+
+        if (not hasClass2) and (dm_token_sk != 'None' and dm_token_sk == dm_match_sk):
+            class3.append(match)
+
+    if hasClass1:
+        candidates = class1
+    elif hasClass2:
+        candidates = class2
+    else:
+        candidates = class3
+
+    if len(candidates) > 1:
+        G = ngram.NGram(candidates)
+        candidatesG = G.search(token)
+        bestMatch = candidatesG[0][0]
+    elif len(candidates) == 1:
+        bestMatch = candidates[0]
+
+    return bestMatch, candidates, candidatesG
 
 
 def execute(method):
@@ -126,6 +173,7 @@ def execute(method):
         json.dump(output, fout)
 
 
-execute(1)
+for i in range(0, 3):
+    execute(i)
 
 
