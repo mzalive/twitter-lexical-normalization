@@ -4,6 +4,7 @@ import ngram
 import time
 import json
 import os
+import sys
 
 token_path = 'data/labelled-tokens.txt'
 dict_path = 'data/dict.txt'
@@ -115,19 +116,56 @@ def match_double_metaphone(token):
 
     return bestMatch, candidates, candidatesG
 
+def match_levenshtein_soundex(token):
+    dictSet = getDict()
+    candidates = []
+    candidatesG = []
+    bestMatch = ""
+    minDistance = 3
+
+    for item in dictSet:
+        distance = Levenshtein.distance(token.lower(), item.lower())
+        if distance == 0:
+            return item, [], []
+        elif distance < minDistance:
+            minDistance = distance
+            candidates = []
+        if distance == minDistance:
+            candidates.append(item.lower())
+
+    soundex = fuzzy.Soundex(4)
+    soundex_token = soundex(token)
+
+    soudex_candidates = [match for match in candidates if soundex(match) == soundex_token]
+
+    if len(soudex_candidates) != 0:
+        candidates = soudex_candidates
+
+    if len(candidates) > 1:
+        G = ngram.NGram(candidates)
+        candidatesG = G.search(token)
+        if len(candidatesG) > 0:
+            bestMatch = candidatesG[0][0]
+    elif len(candidates) == 1:
+        bestMatch = candidates[0]
+
+    return bestMatch, candidates, candidatesG
 
 def execute(method):
     results = []
 
-    if method == 0:
+    if method == "0":
         methodName = 'levenshtein'
         target_method = match_levenshtein
-    elif method == 1:
+    elif method == "1":
         methodName = 'soundex'
         target_method = match_soundex
-    else:
+    elif method == "2":
         methodName = 'double_metaphone'
         target_method = match_double_metaphone
+    else:
+        methodName = 'levenshtein_soudex'
+        target_method = match_levenshtein_soundex
 
     timestamp_start = time.time()
 
@@ -172,7 +210,14 @@ def execute(method):
         json.dump(output, fout)
 
 
-for i in range(1, 3):
-    execute(i)
+if len(sys.argv) < 2:
+    print 'Please specify method:\n' \
+          '0: Levenshtein\n' \
+          '1: Soundex\n' \
+          '2: Double Metaphone\n' \
+          '3: Levenshtein + Soundex'
+    exit()
+method = sys.argv[1]
+execute(method)
 
 
