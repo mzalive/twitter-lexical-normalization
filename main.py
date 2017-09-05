@@ -56,7 +56,8 @@ def match_soundex(token):
     if len(candidates) > 1:
         G = ngram.NGram(candidates)
         candidatesG = G.search(token)
-        bestMatch = candidatesG[0][0]
+        if len(candidatesG) > 0:
+            bestMatch = candidatesG[0][0]
     elif len(candidates) == 1:
         bestMatch = candidates[0]
 
@@ -107,7 +108,8 @@ def match_double_metaphone(token):
     if len(candidates) > 1:
         G = ngram.NGram(candidates)
         candidatesG = G.search(token)
-        bestMatch = candidatesG[0][0]
+        if len(candidatesG) > 0:
+            bestMatch = candidatesG[0][0]
     elif len(candidates) == 1:
         bestMatch = candidates[0]
 
@@ -129,12 +131,12 @@ def execute(method):
 
     timestamp_start = time.time()
 
-    with open('data/labelled-tokens.txt', 'r') as tokenFile:
+    with open(token_path, 'r') as tokenFile:
         for tokenLine in tokenFile:
             tokenSet = tokenLine.split('\t')
-            token = tokenSet[0].strip()
+            token = unicode(tokenSet[0].strip(), errors='ignore').encode()
             code = tokenSet[1].strip()
-            canonical = tokenSet[2].strip()
+            canonical = unicode(tokenSet[2].strip(), errors='ignore').encode()
 
             best_match, candidates, candidatesG = target_method(token)
 
@@ -170,7 +172,7 @@ def execute(method):
         json.dump(output, fout)
 
 
-for i in range(0, 3):
+for i in range(1, 3):
     execute(i)
 
 
