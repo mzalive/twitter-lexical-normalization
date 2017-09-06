@@ -164,9 +164,10 @@ def execute(method):
         methodName = 'double_metaphone'
         target_method = match_double_metaphone
     else:
-        methodName = 'levenshtein_soudex'
+        methodName = 'levenshtein_soundex'
         target_method = match_levenshtein_soundex
 
+    print methodName
     timestamp_start = time.time()
 
     with open(token_path, 'r') as tokenFile:
@@ -175,6 +176,9 @@ def execute(method):
             token = unicode(tokenSet[0].strip(), errors='ignore').encode()
             code = tokenSet[1].strip()
             canonical = unicode(tokenSet[2].strip(), errors='ignore').encode()
+
+            if code != 'OOV':
+                continue
 
             best_match, candidates, candidatesG = target_method(token)
 
@@ -217,7 +221,6 @@ if len(sys.argv) < 2:
           '2: Double Metaphone\n' \
           '3: Levenshtein + Soundex'
     exit()
+
 method = sys.argv[1]
 execute(method)
-
-
