@@ -1,7 +1,7 @@
 # Twitter Lexical Normalisation
 COMP90049 Knowledge Technologies, Semester 2 2017
 <br>
-Project 1 Assignment - Lexical Normalisation of Twitter Data
+Project 1 - Lexical Normalisation of Twitter Data
 
 ### Overview
 This project is a python script that uses varieties of string matching method correct misspelled words.
